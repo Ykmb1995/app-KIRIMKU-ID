@@ -7,27 +7,65 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint (apps/api)
+        run: |
+          if [ -f apps/api/package.json ]; then npm run --prefix apps/api lint || true; fi
 
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build (apps/api)
+        run: |
+          if [ -f apps/api/package.json ]; then npm run --prefix apps/api build || true; fi
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
-
       - name: Install dependencies
         run: npm ci
-
       - name: Run tests (apps/api)
         run: npm run --prefix apps/api test
-
       - name: Upload jest results (optional)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jest-results
           path: apps/api/jest-junit.xml
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Placeholder deploy step
+        run: echo "Add deploy steps here (e.g., docker build & push, or cloud deploy)"
