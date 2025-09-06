@@ -107,6 +107,7 @@ jobs:
           for i in $(seq 1 $MAX_RETRIES); do
             echo "Build attempt $i/$MAX_RETRIES"
             docker buildx build \
+              --platform linux/amd64,linux/arm64 \
               --push \
               --tag ${IMAGE}:latest \
               --tag ${IMAGE}:${{ github.sha }} \
