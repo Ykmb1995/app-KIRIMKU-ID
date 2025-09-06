@@ -1,0 +1,62 @@
+// Prisma schema for Kirimku.ID
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   // admin, user, etc
+  teamId    String?
+  orders    Order[]
+  webhooks  Webhook[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id            String   @id @default(uuid())
+  userId        String
+  ekspedisi     String
+  trackingCode  String?
+  status        String
+  labelUrl      String?
+  pickupStatus  String?
+  cod           Boolean
+  insurance     Boolean
+  items         Json
+  address       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model Webhook {
+  id        String   @id @default(uuid())
+  userId    String
+  url       String
+  event     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Invoice {
+  id          String   @id @default(uuid())
+  userId      String
+  amount      Float
+  description String?
+  dueDate     DateTime?
+  status      String   // paid, unpaid, overdue
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+}

@@ -1,0 +1,23 @@
+{
+  "name": "kirimku-id",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "yarn workspace api start:dev",
+    "dev:dashboard": "yarn workspace dashboard dev",
+    "dev": "concurrently \"yarn dev:api\" \"yarn dev:dashboard\""
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^24.0.4",
+    "bcrypt": "^6.0.0",
+    "concurrently": "^8.0.0",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.10.1"
+  }
+}
