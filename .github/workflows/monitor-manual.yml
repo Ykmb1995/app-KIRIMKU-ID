@@ -29,11 +29,18 @@ jobs:
     runs-on: ubuntu-latest
     if: failure()
     steps:
+      - name: Prepare issue body
+        run: |
+          cat > issue.md <<'EOF'
+          The manual GHCR monitor run failed to pull the latest image for `app-kirimku-id`.
+          Please check the Actions run logs and GHCR package settings.
+          EOF
+
       - name: Create issue when image pull fails
         uses: peter-evans/create-issue-from-file@v4
         with:
           title: "Monitor: GHCR image pull failed (manual run)"
-          content: |
-            The manual GHCR monitor run failed to pull the latest image for `app-kirimku-id`.
-            Please check the Actions run logs and GHCR package settings.
+          content-filepath: issue.md
           labels: bug, infra
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
