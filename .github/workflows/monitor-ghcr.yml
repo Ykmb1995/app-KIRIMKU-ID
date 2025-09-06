@@ -1,0 +1,40 @@
+name: Monitor GHCR
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # daily at 03:00 UTC
+
+jobs:
+  check-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+
+      - name: Attempt to pull latest image
+        id: pull
+        run: |
+          set -e
+          echo "Trying to pull ghcr.io/${{ github.repository_owner }}/app-kirimku-id:latest"
+          docker pull ghcr.io/${{ github.repository_owner }}/app-kirimku-id:latest || exit 1
+
+  report:
+    needs: check-image
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Create issue when image pull fails
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: "Monitor: GHCR image pull failed"
+          content: |
+            The scheduled GHCR monitor failed to pull the latest image for `app-kirimku-id`.
+            Please check the Actions run logs and GHCR package settings.
+          labels: bug, infra
