@@ -2,6 +2,8 @@
 
 Unified Shipping API & Dashboard untuk semua ekspedisi Indonesia.
 
+![CI](https://github.com/Ykmb1995/app-KIRIMKU-ID/actions/workflows/ci.yml/badge.svg?branch=main)
+
 ## Struktur Monorepo
 - apps/api: Backend utama (NestJS)
 - apps/dashboard: Frontend dashboard (React.js)
